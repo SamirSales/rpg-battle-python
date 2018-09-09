@@ -1,6 +1,8 @@
 from classes.game import Person, bcolors
 from classes.magic import Spell
-from  classes.inventory import Item
+from classes.inventory import Item
+
+import os
 
 # Create Black Magic
 fire = Spell("Fire", 10, 100, "black")
@@ -34,9 +36,15 @@ player_items = [{"item": potion, "quantity": 15},
 player = Person(460, 65, 60, 34, player_spells, player_items)
 enemy = Person(1200, 65, 45, 25, [], [])
 
+
+def reset_screen():
+    os.system("clear")
+
+
 running = True
 i = 0
 
+reset_screen()
 print(bcolors.FAIL + bcolors.BOLD + "AN ENEMY ATTACKS!" + bcolors.ENDC)
 
 while running:
@@ -48,6 +56,7 @@ while running:
     if index == 0:
         dmg = player.generate_damage()
         enemy.take_damage(dmg)
+        reset_screen()
         print("You attacked for", dmg, "points of damage. Enemy HP:", enemy.get_hp())
     elif index == 1:
         player.choose_magic()
@@ -62,6 +71,7 @@ while running:
         current_mp = player.get_mp()
 
         if spell.cost > current_mp:
+            reset_screen()
             print(bcolors.FAIL + "\nNot enough MP\n" + bcolors.ENDC)
             continue
 
@@ -69,9 +79,11 @@ while running:
 
         if spell.type == "white":
             player.heal(magic_dmg)
+            reset_screen()
             print(bcolors.OKBLUE + "\n" + spell.name + " heals for", str(magic_dmg), "HP." + bcolors.ENDC)
         elif spell.type == "black":
             enemy.take_damage(magic_dmg)
+            reset_screen()
             print(bcolors.OKBLUE + "\n" + spell.name, "deals", str(magic_dmg), "points of damage" + bcolors.ENDC)
     elif index == 2:
         player.choose_item()
@@ -81,6 +93,7 @@ while running:
             continue
 
         if player.items[item_choice]["quantity"] == 0:
+            reset_screen()
             print(bcolors.FAIL + "\n You have no " + item.name + " anymore." + bcolors.ENDC)
             continue
 
@@ -89,13 +102,16 @@ while running:
 
         if item.type == "potion":
             player.heal(item.prop)
+            reset_screen()
             print(bcolors.OKGREEN + "\n" + item.name + " heals for", str(item.prop), "HP" + bcolors.ENDC)
         elif item.type == "elixer":
             player.mp = player.max_mp
             player.hp = player.max_hp
+            reset_screen()
             print(bcolors.OKGREEN + "\n" + item.name + " fully restores HP/MP" + bcolors.ENDC)
         elif item.type == "attack":
             enemy.take_damage(item.prop)
+            reset_screen()
             print(bcolors.FAIL + "\n" + item.name + " deals", str(item.prop), "points of damage" + bcolors.ENDC)
 
     print("-----------------------------------------")
@@ -116,5 +132,4 @@ while running:
 
     if player.get_hp() <= 0:
         print(bcolors.FAIL + "You lose!" + bcolors.ENDC)
-
-
+        running = False
